@@ -4,7 +4,7 @@
 #'
 #' @param x
 #'
-#' @return a vector of squared values
+#' @return a vector of squared values in the form of a vector
 #' @return a string of characters
 #'
 #' @export
