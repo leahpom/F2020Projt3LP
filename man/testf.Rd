@@ -7,10 +7,10 @@
 testf(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{a vector}
 }
 \value{
-a vector of squared values
+a vector of squared values in the form of a vector
 
 a string of characters
 }

@@ -2,7 +2,7 @@
 #'
 #' Takes a vector and returns its square. Also gives a statement as to what the purpose is
 #'
-#' @param x
+#' @param x a vector
 #'
 #' @return a vector of squared values in the form of a vector
 #' @return a string of characters

@@ -11,3 +11,7 @@ LazyData: true
 RoxygenNote: 7.1.1
 URL: https://github.com/leahpom/F2020Projt3LP
 BugReports: https://github.com/leahpom/F2020Projt3LP/issues
+Imports: 
+    s20x,
+    car,
+    lmtest
