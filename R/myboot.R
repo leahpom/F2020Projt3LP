@@ -7,6 +7,8 @@
 #' @return Summary statistics for the bootstrapped betas
 #' @return Histograms of the bootstrapped betas
 #' @return Confidence intervals for the boostrapped betas
+#' @return Classical MLR method point estimates
+#' @return Classical MLR confidence interval estimates based on alpha
 #' @export
 #'
 #' @examples
@@ -89,7 +91,50 @@ myboot <- function(iter, df, alpha=0.05){ # first column is response,
     conf.int[j, ] <- ci
   }
 
-  # 5. Histograms for the beta estimates
+  # 5. Traditional Point Estimates
+
+  # use the linear algebra method
+
+  Y1 <- df[,1] # first column is the dependent variable
+  Y1 <- as.matrix(Y1)
+  X1 <- df[, -1] # generic for any size
+  X1 <- as.matrix(cbind(1, X1))
+  XTX.inv1 <- try(solve(t(X)%*%X), silent = TRUE)
+
+  if(inherits(XTX.inv1, "try-error")){
+    Beta.Est <- "Matrix is singular"
+  }
+  else{
+    Beta.Est <- XTX.inv1%*%t(X1)%*%Y1
+
+  }
+
+  # 6. Traditional Confidence Interval Estimates
+
+  # create the matrix to hold the estimates
+  beta.cis <- matrix(NA, nrow = ncol(X1), ncol = 3)
+  rownames(beta.cis) <- names(df)
+  rownames(beta.cis)[1] <- "Intercept"
+  colnames(beta.cis) <- c("Point Estimate", "Lower Bound", "Upper Bound")
+  beta.cis[, 1] <- Beta.Est
+
+  # set up the necessary values
+  dfreedom <- nrow(df) - ncol(df)
+  t <- qt(1-alpha/2, dfreedom)
+
+  be.mat <- as.matrix(Beta.Est, byrow = TRUE) # I need the estimates to be a matrix for SSE
+  SSE <- t(Y1)%*%Y1 - t(be.mat)%*%t(X1)%*%Y1
+  s.sq <- SSE/(nrow(df) - nrow(be.mat) - 1) # this is necessary for the formula
+  s <- sqrt(s.sq) # final form for the formula
+  num <- t*s # term to the right of the plus/minus sign - needs to be multiplied by c_ii
+  c <- XTX.inv1 # The matrix of covariances
+
+  for (h in 1:nrow(c)) {
+    beta.cis[h, 2] <- be.mat[h, 1] - num*sqrt(c[h,h]) # lower bound
+    beta.cis[h, 3] <- be.mat[h, 1] + num*sqrt(c[h,h]) # upper bound
+  }
+
+  # 7. Histograms for the beta estimates
 
   hist <- mapply(mat1, 0:(ncol(mat1)-1),
                  FUN = function(vector, index){
@@ -99,6 +144,7 @@ myboot <- function(iter, df, alpha=0.05){ # first column is response,
   # just to be safe in the number for rainbow, I'm using a ridiculously large number
 
   dalist <- list("Summary of Betas" = mat.sum, "Confidence Intervals" = conf.int,
-                 "Occurences of Singularity" = num.err, "Histograms" = hist)
+                 "Occurences of Singularity" = num.err,"Classical MLR Point Estimates" = Beta.Est,
+                 "Classical MLR Interval Estimates" = beta.cis,"Histograms" = hist)
   return(dalist) # Works up to here!!
 }

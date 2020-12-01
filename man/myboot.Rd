@@ -19,6 +19,10 @@ Summary statistics for the bootstrapped betas
 Histograms of the bootstrapped betas
 
 Confidence intervals for the boostrapped betas
+
+Classical MLR method point estimates
+
+Classical MLR confidence interval estimates based on alpha
 }
 \description{
 Title
