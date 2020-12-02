@@ -2,4 +2,5 @@
 
 export(fun1)
 export(myboot)
+export(shinyMLR)
 export(testf)
