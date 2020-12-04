@@ -2,7 +2,7 @@
 % Please edit documentation in R/myboot.R
 \name{myboot}
 \alias{myboot}
-\title{Title}
+\title{Bootstrap Function}
 \usage{
 myboot(iter, df, alpha = 0.05)
 }
@@ -25,7 +25,7 @@ Classical MLR method point estimates
 Classical MLR confidence interval estimates based on alpha
 }
 \description{
-Title
+Bootstrap Function
 }
 \examples{
 y <- rnorm(100, 0, 1)

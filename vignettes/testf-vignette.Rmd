@@ -1,0 +1,51 @@
+---
+title: "testf-vignette"
+output: 
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    math: katex
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{testf-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(F2020Projt3LP)
+```
+
+# Purpose
+
+The intent of this vignette is for me to experiment with making a vignette by creating a short description of my testf() function within the package
+
+# testf
+
+## Why does it exist
+
+I wrote this function as a way to check that I had set up my package properly. I wanted to make sure that everything was working, especially with GitHub, before putting the important functions into the package
+
+## What does it do
+
+It is a very simple function that will take a vector input, square it, return the output, and then also return a statement saying what the purpose of the function is. This is not important for the graded/assigned part of Project 3.
+
+## Example
+
+Here is an example of the function working
+
+```{r}
+x <- 1:10
+testf(x)
+```
+
+As you can see from the above output, the function does what I described.

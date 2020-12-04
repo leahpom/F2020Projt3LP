@@ -4,13 +4,19 @@
 \alias{bayes.1}
 \title{Bayesian Regression Function}
 \usage{
-bayes.1(iter = 10000, init = 0.5, y, a, b, df, b.0 = 0, d.0 = 0.001)
+bayes.1(
+  y,
+  a,
+  b,
+  df,
+  name.dep,
+  b.0 = 0,
+  d.0 = 0.001,
+  c.0 = 0.001,
+  burn.in = 1000
+)
 }
 \arguments{
-\item{iter}{number of iterations for the simulations}
-
-\item{init}{prior}
-
 \item{y}{the column number in the data frame for the dependent variable}
 
 \item{a}{the start column number in the data frame for the independent variables}
@@ -19,31 +25,34 @@ bayes.1(iter = 10000, init = 0.5, y, a, b, df, b.0 = 0, d.0 = 0.001)
 
 \item{df}{data frame for the regression}
 
-\item{b.0}{prior mean of beta. Set to function default, but can be updated by the user}
+\item{name.dep}{name of the dependent variable. Important for doing regression.}
 
-\item{d.0}{prior scale parameter. Set to function default, but can be updated by the user}
+\item{b.0}{prior mean of beta. Set to mcmcRegress default, but can be updated by the user}
+
+\item{d.0}{prior scale parameter. Set to mcmcRegress default, but can be updated by the user}
+
+\item{c.0}{prior shape parameter. Set to mcmcRegress default, but can be updated by the user}
+
+\item{burn.in}{value for the burn.in. Set to mcmcRegress defualt, but can be updated by the user}
 }
 \value{
-Command-line stats for posterior and mean
-
-Mean for posteriors
-
-Plot of sampler
-
 Summary statistics for classical regression
 
 Confidence intervals for classical regression
 
-Summary statistics for bayesian regression
+Summary statistics for Bayesian regression
 
 Posterior plots of marginal distributions
 
 Posterior MCMC Trace and History Plots
+
+Posterior Diagnostics
 }
 \description{
 Bayesian Regression Function
 }
 \examples{
-\dontrun{data <- diamonds, bayes.1(y = 1, a = 2, b = 3, df = data)}
+data <- diamonds
+bayes.1(y = 1, a = 2, b = 3, df = data, name.dep = "price")
 
 }

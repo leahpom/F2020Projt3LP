@@ -1,4 +1,4 @@
-#' Title
+#' Bootstrap Function
 #'
 #' @param iter # number of iterations for the bootstrap
 #' @param df # data grame with first column response, other columns are relevant independent variables

@@ -1,4 +1,4 @@
-#' Title
+#' MLR Assumptions Function
 #'
 #' @param lm a linear model
 #' @param k the number of independent variables in the model
@@ -19,10 +19,6 @@
 #' ylm <- lm(y ~ x1 + x2)
 #' fun1(ylm, 2)
 fun1 <- function(lm, k){
-
-  # LIBRARY STATEMENTS
-  # requireNamespace(lmtest)
-  # requireNamespace(car)
 
   # COMMAND LINE STATISTICS
 

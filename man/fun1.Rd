@@ -2,7 +2,7 @@
 % Please edit documentation in R/fun1.R
 \name{fun1}
 \alias{fun1}
-\title{Title}
+\title{MLR Assumptions Function}
 \usage{
 fun1(lm, k)
 }
@@ -27,7 +27,7 @@ a plot of the fitted values vs. residuals
 a QQ plot
 }
 \description{
-Title
+MLR Assumptions Function
 }
 \examples{
 y <- rnorm(100, 1, 0)

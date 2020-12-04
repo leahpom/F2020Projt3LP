@@ -1,0 +1,256 @@
+---
+title: "Project_3_Functions_Vignette"
+output: 
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
+    math: katex
+    df_print: paged
+    toc: yes
+    toc_depth: 4
+    
+vignette: >
+  %\VignetteIndexEntry{Project_3_Functions_Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(F2020Projt3LP)
+```
+
+# Function 1: fun1
+
+This is the first function for this project
+
+## What does it do?
+
+This function helps us look at the validity of a Multiple Linear Regression model. The user inputs a regression model and it gives helpful command-line statistics and graphs to be able to tell if those assumptions are met. 
+
+## Necessary Theory
+
+The four assumptions of MLR are:
+
+1. The mean value of the probability distribution of the error term $\epsilon$ is zero.
+
+1. The variance of the probability distribution of $\epsilon$ is constant for each setting of x.
+
+1. $\epsilon$ has a normal probability distribution.
+
+1. Errors are independent, i.e. the error associated with a particular x is independent from the error associated with a different x.
+
+In order to have a statistically valid MLR model, we need to check that each of these assumptions is met.
+
+## Worked Example
+
+In this example, I'm going to use a real data set to show this function working. The data I'm going to use is called "PRODQUAL" and is available in this package.
+
+```{r}
+p <- PRODQUAL
+head(p) # an overview of the data
+
+ylm <- lm(QUALITY ~ TEMP + PRESSURE, data = p) # a basic MLR model
+```
+
+I'm just starting with a pretty basic MLR model, so we can have an idea of how it works. I'm using log(price) because it doesn't make sense for price to be zero or less. In these situations, it is standard practice to take the log, since those can never be zero. Below, we can call the function and explain the output.
+
+```{r}
+f <- fun1(ylm, k=2) # we have two independent variables
+f
+```
+
+### Interpretation of output
+
+#### Residual Plots
+
+The first output that we have is two residual plots, one for each independent variable. This allows us to visually check the zero mean assumption of $\epsilon$, Assumption (1) from the list above. What we want to see is no pattern to the scatter; a relatively random distribution about zero. We don't seem to see that here, so this tells us from the start that this might not be a valid regression model.
+
+#### Residuals vs. Fitted Values
+
+This is a way to check the constant variance assumption (Assumption (2)). Again, we want relatively random scatter to satisfy the assumption. Things do seem to be mostly random here, and we can't expect perfection from our data. So we would likely say that this assumption has been satisfied, from looking at this output. Although, this is not a definitive test, so this is slightly up to the user's discretion.
+
+#### QQ Plot
+
+This is the final plot and it is a way for us to check the assumption that errors are distributed Normally (Assumption (3)). We want to see the data lying in mostly a straight line without any strong trends, and this does seem to be the case. 
+
+#### Shapiro-Wilk Test
+
+In the command-line output, the first results are the Shapiro-Wilk Test. This is a way of testing the assumption that errors are distributed Normally (Assumption (3)). Our null hypothesis under this test is that they are Normally distributed. This means that, if we want to do MLR, we actually want to fail to reject this null hypothesis and accept as plausible that the errors are Normally distributed. If we are using a standard $\alpha$ level of 0.05, we fail to reject this null hypothesis because our p-value for the test is 0.1103, which is greater than $\alpha = 0.05$. This agrees with our interpretation of the QQ-Plot
+
+#### Breusch-Pagan Test
+
+This will allow us to check the equality of variance assumption (Assumption 2). The null hypothesis is equal variance (homoskedasticity). Like with the Shapiro-Wilk test, this means that we want to fail to reject the null hypothesis to do MLR. If we are using the standard $\alpha$ level of 0.05, we fail to reject the null hypothesis for this data. Our p-value is 0.9584, which is much greater than $\alpha = 0.05$. This agrees with our interpretation of the residuals vs. fitted values plot.
+
+#### Durbin-Watson Test
+
+This test is a way to check the fourth assumption, that the errors are independent. The test uses time series techniques. We want the calculated statistic to be "small"/close to 2 for this assumption to be valid. It looks like this assumption is met, since our test statistic is 0.86485. But this one is more open to user preference. 
+
+# Function 2: myboot
+
+This is the second function for this project
+
+## What does it do?
+
+This function takes the inputs of number of iterations ("iter"), a data frame ("df"), and significance level ("alpha") in order to perform bootstrapping techniques on the data and compare it to classical statistical methods. It returns summary statistics for the bootstrapped betas, histograms of the bootstrapped betas, confidence intervals for the boostrapped betas, classical MLR method point estimates, and classical MLR confidence interval estimates based on alpha.
+
+## Necessary Theory
+
+Bootstrapping works, fundamentally, by re-sampling from our data frame numerous times and creating a "population" from that sample. This means that, while we normally estimate features of our population (e.g. variance, mean, etc.), we can "know" these, because our population IS our re-samples. We are sampling with replacement when we bootstrap. This means that we can run into a nasty problem with multicollinearity. 
+
+Multicollinearit occurs when two of our x columns (independent variables) are either the same or almost the same. This means that the two columns are linearly dependent on each other. This is a problem because of how we form MLR estimates. We use matrix algebra as follows:
+
+$$
+Y = X\hat{\beta} + \hat{\epsilon} \\
+Y - X\hat{\beta} = \hat{\epsilon} \\
+X' \cdot (Y - X\hat{\beta}) = X' \cdot\hat{\epsilon} \\
+\text{Note: } \hat{\epsilon} \text{ is orthogonal to } X' \text{ so the dot product is zero} \\
+X' \cdot (Y - X\hat{\beta}) = 0 \\
+X' \cdot Y - X' \cdot X\hat{\beta} = 0 \\
+X' \cdot Y = X' \cdot X\hat{\beta} \\
+(X'X)^{-1}X' \cdot Y = (X'X)^{-1}X' \cdot X\hat{\beta} \\
+(X'X)^{-1}X' \cdot Y = I\hat{\beta} \\
+\hat{\beta} = (X'X)^{-1}X'Y
+$$
+
+As shown in the above matrix-algebra, we are taking the inverse of matrices when we form our coefficient estimates. If we have multicollinearity, the inverse may not exist. 
+
+Since we are at-risk for multicollinearity when using bootstrap techniques, we have to account for this in the function. The function uses a function called try() and is set up so that, if the inverse does not exist, it counts as an error and does not get included in the sample. The problem with this is that we are then throwing away data, so we could get a *biased* sample. In order to account for that, we create histograms of the betas and show the summary statistics. We can use these in conjunction with the number of failures to try and see if there is bias.
+
+## Worked Example
+
+I'm going to use the same example that we did for the in-class bootstrap assignment. This is the CASTINGS data, which I have added to this package. The code is below and the interpretation of the output follows.
+
+```{r}
+cast <- CASTINGS # load the data frame
+cast.2 <- cast[, c(3, 2, 4, 5)] # edit based on the required structure for the data frame
+names(cast.2)[4] <- "INTERACTION"
+theresasnakeinmyboot <- myboot(df = cast.2, iter = 1000) # run the function
+# I think this variable name is funny
+theresasnakeinmyboot # view the output
+```
+
+### Interpretation of Output
+
+#### Histograms
+
+The histograms are of our beta estimates that we got from bootstrapping. We can look at the estimates to see if there's a skew to the histogram. This would give us an indication that we may have biased estimates, likely due to singularity. Skewed histograms should point us to check our occurrences of singularity count.
+
+#### Summary of Betas
+
+This gives summary statistics of our beta estimates. It has minimum, first quartile, median, mean, third quartile, and maximum. This allows us to get an overview of the data.
+
+#### Confidence Intervals
+
+We can compare the confidence intervals that we got from the bootstrap technique to what we get from the classical MLR methods of taking one sample and doing analysis on that.
+
+#### Occurences of Singularity
+
+This is a count of the number of times that we see singularity, i.e. that we had multicollinearity in our data such that we couldn't actually calculate the inverse. This tells us how many iterations we had to throw out so we can know if our estimates may be biased.
+
+#### Classical MLR Point Estimates
+
+This forms a classical MLR model and gives the summary statistics so we can compare it to the summary statistics from the bootstrap method.
+
+#### Classical MLR Interval Estimates
+
+As above, we create the interval estimates so we can compare them to the interval estimates that our bootstrap method gives.
+
+# Function 3: bayes.1
+
+This is the third function for this project
+
+## What does it do?
+
+This does a Bayesian analysis with a prior that can be set by the user, but the default is a low-impact prior.
+
+## Necessary Theory
+
+The basics of Bayesian inference is Bayes formula:
+
+$$
+p(\theta|x)  = \frac{p(\theta)f(x|\theta)}{p(x)}
+$$
+
+We are trying to obtain the prior, $p(\theta|x)$, which is proportional to the the marginal, $p(x)$. So we can write:
+
+$$
+p(\theta|x)\propto p(\theta)f(x|\theta)
+$$
+
+In Bayesian inference, we know $x$, but we don't know $\theta$. So we do something called Markov Chain Monte-Carlo to create a sample for the posterior. The default in the functions that we use is to have low-impact priors, which is why the function that we have uses the default values. But, as we gain more information about the data and what is going on, we may want to update it, which is why the function is written such that the user can update the prior.
+
+## Worked Example
+
+For this example, we'll use the diamond data frame, which is in base R.
+
+```{r}
+d <- diamonds
+b<-bayes.1(y = 7, a = 5, b = 6, df = d, name.dep = "price")
+b
+```
+
+### Interpretation of Output
+
+#### Point Estimates for Classical Regression
+
+This is classical MLR output. We can look at it to see the difference between the Bayesian estimates formed by Markov Chains and classical regression.
+
+#### Interval Estimates for Classical Regression
+
+Same as above. We want to look at the difference between Bayesian and Classical statistics.
+
+#### Estimates from Bayesian Regression
+
+This is the output from doing a summary of MCMC regression. So here, we have commandline quantiles for the posterior and mean and the Bayesian estimates. One of the biggest differences here is how we can interpret the Bayesian estimates. Because of how we set up our Bayesian statistics, we are able to say that we have probabilities. So, for example, the interval estimates for the Bayesian estimates are actually probability intervals. In the classical interval estimates, we call these "confidence intervals" because we are not doing infinite sampling. 
+
+For example, our 95% interval for $\beta_1$, depth, is (57.72, 106.0). We can say that there is  95% *probability* that $\beta_1$ is in that interval. Unfortunately, that interval includes zero,
+
+We also get the following regression formula for our data: 
+
+$$
+\widehat{price} = -15080  - 82.16 depth + 242.6table
+$$
+
+
+#### Posterior Plots of Marginal Distributions
+
+When we're looking at this for any regression model, we want to see well-formed and unimodal distributions for our beta parameters. We see this on our graphs, which is a good sign in our analysis.
+
+#### Posterior Trace and History Plots
+
+These are the plots that appear at the top of the graph. Unfortunately, due to how consolidated the window is in the knitted document, it doesn't appear well. But, when used normally, the graphs view well. What we want to see in the trace plots is a lot of movement; we don't want to see stasis, where the chain was moving in the same place for a while. This makes it an important *diagnostic plot* (as requested in the function instructions). There is more diagnostic output, but these are important diagnostic plots. If we see a lot of stasis in our density plots, we need to adapt our model. In the density plots, we're looking at a summary of our posterior.
+
+#### Posterior Diagnostics
+
+The posterior diagnostics of this is the Geweke diagnostic. This is looking at convergence in the chain. If our mean in the first ten percent isn't significantly different from the mean in the last fifty percent, then we have evidence that the convergence occurred somewhere early in, near the first ten percent (helps us determine the burn-in period). The user can determine if there is evidence for or against convergence.
+
+# Function 4: shinyMLR
+
+This is the fourth and final function for this project.
+
+## What does it do?
+
+This creates a shiny server that allows us to look at 3D models for the PRODQUAL data. The data has three columns, so the user can select which of three models it would like to look at. The first model has Temperature ("TEMP") as the dependent variable, the second has Quality ("QUALITY") as the dependent variable, and the third has Pressure ("PRESSURE") as the dependent variable. It then uses plotly to create a 3D regression scatterplot and plane.
+
+## Necessary Theory
+
+This is just using MLR theory where the beta estimates are formed the same way as explained in the myboot() theory. We are investigating whether a linear relationship exists, but, unlike in simple linear regression, we have three dimensions. So we have a regression plane instead of a regression line.
+
+## Example (how to run)
+
+Shiny does not play nice with .Rmd documents, so I'm going to set up my R chunk so that it will not run. My video for this assignment will show it running. But I can show how you can call the app by its function.
+
+```{r eval=FALSE}
+shinyMLR()
+```
+
+
+
+

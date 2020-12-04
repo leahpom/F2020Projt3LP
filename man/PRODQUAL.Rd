@@ -7,7 +7,7 @@
 \format{
 A data frame with 28 rows and 3 variables:
 \describe{
-  \item{TEMPERATURE}{degrees Fahrenheit Temperature at which the chemical reaction took place}
+  \item{TEMP}{degrees Fahrenheit Temperature at which the chemical reaction took place}
   \item{PRESSURE}{Pressure at which the chemical reaction took place in psi}
   \item{QUALITY}{Average of 4 scores from 0-100 independently assigned by four inspectors to measure quality}
 }
