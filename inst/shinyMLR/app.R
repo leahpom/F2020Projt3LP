@@ -74,7 +74,7 @@ server <- (function(input, output, session) {
                 layout(scene = list(aspectmode = "manual", aspectratio = list(x=1, y=1, z=1),
                                     xaxis = list(title = "X1", range = c(0, 100)),
                                     yaxis = list(title = "X2", range = c(0,100)),
-                                    zaxis = list(title = "Y", range = pretty(z)[c(1,8)])
+                                    zaxis = list(title = "Y", range = pretty(z)[c(0,100)])
                 )
                 )
         }
@@ -119,7 +119,7 @@ server <- (function(input, output, session) {
                 layout(scene = list(aspectmode = "manual", aspectratio = list(x=1, y=1, z=1),
                                     xaxis = list(title = "X1", range = c(0, 100)),
                                     yaxis = list(title = "X2", range = c(0,100)),
-                                    zaxis = list(title = "Y", range = pretty(z)[c(1,8)])
+                                    zaxis = list(title = "Y", range = pretty(z)[c(0, 100)])
                 )
                 )
         }
@@ -164,7 +164,7 @@ server <- (function(input, output, session) {
                 layout(scene = list(aspectmode = "manual", aspectratio = list(x=1, y=1, z=1),
                                     xaxis = list(title = "X1", range = c(0, 100)),
                                     yaxis = list(title = "X2", range = c(0,100)),
-                                    zaxis = list(title = "Y", range = pretty(z)[c(1,8)])
+                                    zaxis = list(title = "Y", range = pretty(z)[c(0,100)])
                 )
                 )
         }
